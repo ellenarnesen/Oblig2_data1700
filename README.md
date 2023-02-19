@@ -1,4 +1,4 @@
-Oblig 1
+Oblig 2
 =======
 OsloMet brukernavn: 
 
