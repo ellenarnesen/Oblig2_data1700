@@ -1,14 +1,54 @@
 let kundene = [];
 function kjopBill(){
+
     //henter data fra input-felt
     const bill = {
-        film: document.getElementById("film").value,
-        antall: document.getElementById("antall").value,
-        navn: document.getElementById("navn").value,
-        etterNavn: document.getElementById("etterNavn").value,
-        telefon: document.getElementById("telefon").value,
-        epost: document.getElementById("epost").value
+        film: $("#film").val(),
+        antall: $("#antall").val(),
+        navn: $("#navn").val(),
+        etterNavn: $("#etterNavn").val(),
+        telefon: $("#telefon").val(),
+        epost: $("#epost").val()
     }
+    $.post("/lagre",bill,function (){ //sender billetten til serveren og skriver ut billett
+        skrivUt()
+        $("film").val("Velg film her")
+        $("antall").val("")
+        $("navn").val("")
+        $("etterNavn").val("")
+        $("telefon").val("")
+        $("epost").val("");
+
+        document.getElementById("feilmelAntall").innerText= ""
+        document.getElementById("feilmelNavn").innerText = ""
+        document.getElementById("feilmelEtterNavn").innerText= ""
+        document.getElementById("feilmelTel").innerText = ""
+        document.getElementById("feilmelEpost").innerText = ""
+
+        })
+}
+
+
+//Skriv ut funksjonen
+function skrivUt(){
+    $.get("/send", function (kundene){
+        let billettUt = "<table>" +
+            "<tr><th>Film</th>" +
+            "<th>Antall</th>" +
+            "<th>Fornavn</th>" +
+            "<th>Etternavn</th>" +
+            "<th>Telefonnr</th>" +
+            "<th>Epost</th></tr>";
+
+        for(let etKjop of kundene){
+            billettUt += "<tr><td>" + etKjop.film + "</td><td>" + etKjop.antall +"</td><td>" + etKjop.navn +
+                "</td><td>" + etKjop.etterNavn + "</td><td>" + etKjop.telefon + "</td><td>"
+                + etKjop.epost + "</td></tr>"
+        }
+        billettUt += "</table>";
+        $("#kjopet").html("")
+    })
+}
 
     let utskrift;
     let error = false;
@@ -53,26 +93,10 @@ function kjopBill(){
         kundene.push(bill)
     }
 
-    let billettUt = "<table>" +
-        "<tr><th>Film</th>" +
-        "<th>Antall</th>" +
-        "<th>Fornavn</th>" +
-        "<th>Etternavn</th>" +
-        "<th>Telefonnr</th>" +
-        "<th>Epost</th></tr>";
 
-    for(let etKjop of kundene){
-        billettUt += "<tr><td>" + etKjop.film + "</td><td>" + etKjop.antall +"</td><td>" + etKjop.navn +
-            "</td><td>" + etKjop.etterNavn + "</td><td>" + etKjop.telefon + "</td><td>"
-            + etKjop.epost + "</td></tr>"
-    }
-
-    document.getElementById("kjopet").innerHTML = billettUt;
-
-}
-
-function slettBill(){
     //sletter billettene (arrayet)
-    kundene = [];
-    document.getElementById("kjopet").innerHTML = " ";
-}
+    function slettBill(){
+        $.post("/slett", function (){
+            $("#kjopet").html("")
+        })
+    }
